@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS''. CLAIMS OTHERWISE
-# ARE ADVISED TO GO FUCK THEMSELVES
 # Idea: Add package arrays for "dependency handling"
 
 # Build the package as a regular user
