@@ -20,7 +20,7 @@ FAKEROOT=${FAKEROOT:-1}
 }
 
 function sbo_query() {
-  read -rp "Enter the Slackware version. " -i 14.1 SBO_VER
+  read -rp "Enter the Slackware version. " -ei 14.1 SBO_VER
   read -rp "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
   SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
   SBO_PKG="${SBO_QRY##*/}"
