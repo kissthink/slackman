@@ -1,0 +1,97 @@
+#!/bin/bash
+
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS''. CLAIMS OTHERWISE
+# ARE ADVISED TO GO FUCK THEMSELVES
+# Idea: Add package arrays for "dependency handling"
+
+# Build the package as a regular user
+# Needs fakeroot (system/fakeroot) for correct permissions
+FAKEROOT=${FAKEROOT:-1}
+
+(( FAKEROOT == 0 )) && (( UID != 0 )) && {
+  echo "This script should be run as root."
+  exit 2
+}
+
+(( FAKEROOT == 1 )) && {
+  # mkdir -p by Slackbuild
+  TMP="$HOME/tmp/SBo"
+  OUTPUT="$HOME"
+}
+
+function sbo_query() {
+  read -rp "Enter the Slackware version. " -i 14.1 SBO_VER
+  read -rp "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
+  SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
+  SBO_PKG="${SBO_QRY##*/}"
+  SBO_URL="$SBO_REP/$SBO_QRY.tar.gz"
+  SBO_LOG="${SBO_LOG:-$OUTPUT/slackman-$SBO_PKG.log}"
+}
+
+function sbo_failcheck() {
+  (( $? == 0 )) || {
+	  echo "Something went wrong. Please check $SBO_LOG."
+	  popd
+	  rm -rf "$SBO_PKG"*
+	  exit 1
+  }
+}
+
+function sbo_download() {
+  wget "$SBO_URL".asc
+  wget "$SBO_URL"
+  sbo_failcheck
+}
+
+function sbo_verify() {
+  gpg --keyserver keys.gnupg.net --recv-keys 9C7BA3B6
+  gpg --verify "$SBO_PKG".tar.gz.asc 
+  sbo_failcheck
+}
+
+function sbo_unpack() {
+  tar xvf "$SBO_PKG".tar.gz
+  pushd "$SBO_PKG"
+  sbo_failcheck
+}
+
+function sbo_source() {
+  echo "PKGNAM VERSION HOMEPAGE DOWNLOAD MD5SUM DOWNLOAD REQUIRES MAINTAINER EMAIL"
+  source "$SBO_PKG".info
+  wget "$DOWNLOAD"
+  md5sum -c <<< $(echo "$MD5SUM  ${DOWNLOAD##*/}")
+  sbo_failcheck
+}
+
+# Build starts here
+sbo_query
+
+echo "Downloading SlackBuild..."
+sbo_download &> "$SBO_LOG"
+
+echo "Veryfing SlackBuild..."
+sbo_verify &>> "$SBO_LOG"
+
+echo "Unpacking..."
+sbo_unpack &>> "$SBO_LOG"
+
+echo "Downloading and verifying sources..."
+sbo_source &>> "$SBO_LOG"
+
+#for i in $REQUIRES; do
+#    /var/log/packages | grep $i
+#done
+
+[[ -z $REQUIRES ]] || {
+    echo "SBO required: $REQUIRES"
+    read -rp "If you're sure, hammer a key to continue..."
+}
+
+# Dirty hack. Root/non-root sections differ per SlackBuild.
+# sed -i 's|^chown|#chown|' ${SBO_PKG}.SlackBuild
+# USE FAKEROOT-NG?
+
+echo "Building the package to $OUTPUT..."
+(( FAKEROOT == 1 )) || source "$SBO_PKG".SlackBuild && {
+    fakeroot ./"$SBO_PKG".SlackBuild
+}
