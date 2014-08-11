@@ -11,8 +11,8 @@ FAKEROOT=${FAKEROOT:-1}
 
 (( $FAKEROOT == 1 )) && {
 	# mkdir -p by Slackbuild
-	TMP="$HOME/tmp/SBo"
-	OUTPUT="$HOME"
+	export TMP="$HOME/tmp/SBo"
+	export OUTPUT="$HOME"
 }
 
 function sbo_query() {
@@ -90,7 +90,7 @@ sbo_source &>> "$SBO_LOG"
 echo "Building the package to $OUTPUT..."
 if (( $FAKEROOT == 1 ))
 then
-	./"$SBO_PKG".SlackBuild
-else
 	fakeroot ./"$SBO_PKG".SlackBuild
+else
+	./"$SBO_PKG".SlackBuild
 fi
