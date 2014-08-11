@@ -1,17 +1,15 @@
 #!/bin/bash
 
-# Idea: Add package arrays for "dependency handling"
-
 # Build the package as a regular user
 # Needs fakeroot (system/fakeroot) for correct permissions
 FAKEROOT=${FAKEROOT:-1}
 
-(( FAKEROOT == 0 )) && (( UID != 0 )) && {
+(( $FAKEROOT == 0 )) && (( $UID != 0 )) && {
 	echo "This script should be run as root."
 	exit 2
 }
 
-(( FAKEROOT == 1 )) && {
+(( $FAKEROOT == 1 )) && {
 	# mkdir -p by Slackbuild
 	TMP="$HOME/tmp/SBo"
 	OUTPUT="$HOME"
@@ -90,6 +88,9 @@ sbo_source &>> "$SBO_LOG"
 # USE FAKEROOT-NG?
 
 echo "Building the package to $OUTPUT..."
-(( FAKEROOT == 1 )) || source "$SBO_PKG".SlackBuild && {
+if (( $FAKEROOT == 1 ))
+then
+	./"$SBO_PKG".SlackBuild
+else
 	fakeroot ./"$SBO_PKG".SlackBuild
-}
+fi
