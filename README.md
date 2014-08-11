@@ -1,0 +1,4 @@
+slackman
+========
+
+Simple SBo manager.
