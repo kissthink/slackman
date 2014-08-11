@@ -52,8 +52,14 @@ function sbo_unpack() {
 function sbo_source() {
 	echo "PKGNAM VERSION HOMEPAGE DOWNLOAD MD5SUM DOWNLOAD REQUIRES MAINTAINER EMAIL"
 	source "$SBO_PKG".info
-	wget "$DOWNLOAD"
-	md5sum -c <<< $(echo "$MD5SUM  ${DOWNLOAD##*/}")
+	if [[ $(uname -m) == x86_64 ]] && [[ -n $DOWNLOAD_x86_64 ]]
+	then
+		wget "$DOWNLOAD_x86_64"
+		md5sum -c <<< $(echo "$MD5SUM_x86_64  ${DOWNLOAD_x86_64##*/}")
+	else
+		wget "$DOWNLOAD"
+		md5sum -c <<< $(echo "$MD5SUM  ${DOWNLOAD##*/}")
+	fi
 	sbo_failcheck
 }
 
