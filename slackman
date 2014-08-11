@@ -30,7 +30,7 @@ function sbo_failcheck() {
   (( $? == 0 )) || {
   	echo "Something went wrong. Please check $SBO_LOG."
 	popd
-	rm -rf "$SBO_PKG"*
+	rm -r "$SBO_PKG"
 	exit 1
   }
 }
