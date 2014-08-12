@@ -1,4 +1,4 @@
 slackman
 ========
 
-Simple SBo manager.
+Simple SBo manager (optionally) using fakeroot.
