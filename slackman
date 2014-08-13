@@ -18,7 +18,6 @@ FAKEROOT=${FAKEROOT:-1}
 # non-interactive mode
 if [[ $1 =~ .*/.* ]]
 then
-	read -rp "Build ${1}? [Enter]"
 	SBO_QRY="$1"
 else
 	read -rp "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
