@@ -15,8 +15,16 @@ FAKEROOT=${FAKEROOT:-1}
 	export OUTPUT="$HOME"
 }
 
-read -rp "Enter the Slackware version. " -ei 14.1 SBO_VER
-read -rp "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
+# non-interactive mode
+if [[ $1 =~ .*/.* ]]
+then
+	read -rp "Build ${1}? [Enter]"
+	SBO_QRY="$1"
+else
+	read -rp "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
+fi
+
+SBO_VER="${SBO_VER:-14.1}"
 SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
 SBO_PKG="${SBO_QRY##*/}"
 SBO_URL="$SBO_REP/$SBO_QRY.tar.gz"
