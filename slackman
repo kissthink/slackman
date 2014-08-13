@@ -11,8 +11,8 @@ FAKEROOT=${FAKEROOT:-1}
 
 (( $FAKEROOT == 1 )) && {
 	# mkdir -p by Slackbuild
-	export TMP="$HOME/tmp/SBo"
-	export OUTPUT="$HOME"
+	export TMP="${TMP:-$HOME/tmp/SBo}"
+	export OUTPUT="${OUTPUT:-$HOME}"
 }
 
 # non-interactive mode
