@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# env: FAKEROOT TMP OUTPUT SBO_VER
+# env: FAKEROOT TMP OUTPUT SBO_VER LOG
 
 # sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
@@ -71,29 +71,41 @@ sbo_unpack() {
 sbo_source() {
 	echo "PKGNAM VERSION HOMEPAGE DOWNLOAD MD5SUM DOWNLOAD REQUIRES MAINTAINER EMAIL"
 	source "$SBO_PKG".info
+	# Split strings to arrays
+	DOWNLOAD=( $DOWNLOAD )
+	DOWNLOAD_x86_64=( $DOWNLOAD_x86_64 )
+	MD5SUM=( $MD5SUM )
+	MD5SUM_x86_64=( $MD5SUM_x86_64 )
+	REQUIRES=( $REQUIRES )
 
+	local i; i=0
 	if [[ $(uname -m) == x86_64 && -n $DOWNLOAD_x86_64 ]]
 	then
-		# FIXME: File and URL names can mismatch, for example for escaped spaces
-		# doesn't work with split download/sum variables
-		wget "$DOWNLOAD_x86_64"
-		md5sum --check --strict <<< $(echo "$MD5SUM_x86_64  ${DOWNLOAD_x86_64##*/}")
+		for DLSUM64 in "${DOWNLOAD[@]}"; do
+			wget "$DLSUM64"
+			md5sum --check --strict <<< $(echo "${MD5SUM_x86_64[$i]}  ${DLSUM64##*/}")
+			let ++i  # return 0, i must not equal -1
+		done
 	else
-		wget "$DOWNLOAD"
-		md5sum --check --strict <<< $(echo "$MD5SUM  ${DOWNLOAD##*/}")
+	       	for DLSUM in "${DOWNLOAD[@]}"; do
+			wget "$DLSUM"
+			md5sum --check --strict <<< $(echo "${MD5SUM[$i]}  ${DLSUM##*/}")
+			let ++i
+		done
 	fi
 }
 
 sbo_deps() {
-	for i in "$REQUIRES"
+	local i; i=
+	for i in "${REQUIRES[@]}"
 	do
-		SBO_INS+=("$(ls /var/log/packages | grep -o "$i")")
+		SBO_INS+=( $(ls /var/log/packages | grep -o "$i") )
 	done
 
-	if [[ $REQUIRES != ${SBO_INS[@]} ]]
+	if [[ ${REQUIRES[@]} != ${SBO_INS[@]} ]]
 	then
 		echo "-------------"
-		echo "SBo required:  $REQUIRES"
+		echo "SBo required:  ${REQUIRES[@]}"
 		echo "SBo installed: ${SBO_INS[@]}"
 		echo "-------------"
 		read -rep $'Continue? [^C to exit]\n'
@@ -147,3 +159,4 @@ sbo_build	>> "$SBO_LOG" 2>&1
 sbo_failcheck
 
 echo "Done!"
+
