@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Slackman - a simple SBo manager
+# Alad Wenter © 2014 MIT license
 
 SBO_VER="${SBO_VER:-14.1}"
 SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
