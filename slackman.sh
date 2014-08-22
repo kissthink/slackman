@@ -43,6 +43,15 @@ then
 	export MAKEFLAGS="-j$CORE"
 fi
 
+# Redirect output to logfile
+SBO_LOG="/tmp/slackman-$SBO_PKG.log"
+
+if [[ $LOG == 0 ]] || ! touch "$SBO_LOG"
+then
+	echo "Logging is disabled."
+	SBO_LOG='/dev/stdout'
+fi
+
 ################################################################################
 
 sbo_exit() {
@@ -136,15 +145,6 @@ sbo_build() {
 ################################################################################
 
 trap sbo_exit EXIT
-
-# Redirect output to logfile
-SBO_LOG="/tmp/slackman-$SBO_PKG.log"
-
-if [[ $LOG == 0 ]] || ! touch "$SBO_LOG"
-then
-	echo "Logging is disabled."
-	SBO_LOG='/dev/stdout'
-fi
 
 # Make sure we don't break systems with custom umask.
 # installpkg does NOT preserve existing permissions
