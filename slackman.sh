@@ -121,15 +121,10 @@ sbo_deps() {
 sbo_build() {
 	if [[ $FROOT == 1 ]]
 	then
-		# Make sure we don't break systems with custom umask.
-		# installpkg does NOT preserve existing permissions
-		umask 0022
-
 		# FIXME: Root/non-root sections differ per SlackBuild, so the entire
 		# Slackbuild is run with fakeroot
 		fakeroot ./"$SBO_PKG".SlackBuild
 	else
-		umask 0022
 		./"$SBO_PKG".SlackBuild
 	fi
 }
@@ -144,6 +139,10 @@ then
 	echo "Logging is disabled."
 	SBO_LOG='/dev/stdout'
 fi
+
+# Make sure we don't break systems with custom umask.
+# installpkg does NOT preserve existing permissions
+umask 0022
 
 # Build starts here
 echo "Downloading SBo..."
