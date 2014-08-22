@@ -3,7 +3,6 @@
 
 SBO_VER="${SBO_VER:-14.1}"
 SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
-
 FROOT="${FROOT:-1}"
 CORE="${CORE:-2}"
 LOG="${LOG:-1}"
