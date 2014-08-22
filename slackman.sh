@@ -9,8 +9,6 @@ FROOT="${FROOT:-1}"
 CORE="${CORE:-2}"
 LOG="${LOG:-1}"
 
-################################################################################
-
 # Note sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
 then
