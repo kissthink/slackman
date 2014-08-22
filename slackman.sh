@@ -12,11 +12,11 @@ LOG="${LOG:-1}"
 # Note sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
 then
-	read -rep $'Warning! You are now building as root. [^C to exit]\n'
+	read -rep $'You are now building as root. Continue?\n'
 	FROOT=0
 fi
 
-# Set to 1 to build as a regular user
+# Set to 1 to build packages without root access
 # Needs fakeroot (system/fakeroot) for correct permissions
 if [[ $FROOT == 1 ]]
 then
@@ -146,8 +146,9 @@ sbo_build() {
 
 trap sbo_exit EXIT
 
-# Make sure we don't break systems with custom umask.
-# installpkg does NOT preserve existing permissions
+# Make sure we don't break systems with custom umask;
+# installpkg overwrites existing permissions
+# http://www.adras.com/12-2-installpkg-messing-up-perms.t8907-75.html
 umask 0022
 
 # Build starts here
