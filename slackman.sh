@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# env: FROOT TMP OUTPUT SBO_VER LOG CORE
 
 SBO_VER="${SBO_VER:-14.1}"
 SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
 FROOT="${FROOT:-1}"
 CORE="${CORE:-2}"
 LOG="${LOG:-1}"
+
+################################################################################
 
 # Note sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
@@ -40,6 +41,8 @@ if [[ $CORE =~ ^[0-9]?[0-9]$ ]]
 then
 	export MAKEFLAGS="-j$CORE"
 fi
+
+################################################################################
 
 sbo_exit() {
  	echo "Cleaning up..."
@@ -128,6 +131,8 @@ sbo_build() {
 		./"$SBO_PKG".SlackBuild
 	fi
 }
+
+################################################################################
 
 trap sbo_exit EXIT
 
