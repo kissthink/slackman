@@ -1,26 +1,30 @@
 #!/usr/bin/env bash
-# env: FAKEROOT TMP OUTPUT SBO_VER LOG
+# env: FROOT TMP OUTPUT SBO_VER LOG CORE
 
-# sudo will break (gpg) permissions
+SBO_VER="${SBO_VER:-14.1}"
+SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
+
+FROOT="${FROOT:-1}"
+CORE="${CORE:-2}"
+LOG="${LOG:-1}"
+
+# Note sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
 then
 	read -rep $'Warning! You are now building as root. [^C to exit]\n'
-	FAKEROOT=0
+	FROOT=0
 fi
 
 # Set to 1 to build as a regular user
 # Needs fakeroot (system/fakeroot) for correct permissions
-# TODO: consider fakeroot-ng
-FAKEROOT=${FAKEROOT:-1}
-
-if [[ $FAKEROOT == 1 ]]
+if [[ $FROOT == 1 ]]
 then
 	# Slackbuild variables (mkdir -p)
 	export TMP="${TMP:-$HOME/tmp/SBo}"
 	export OUTPUT="${OUTPUT:-$HOME}"
 fi
 
-# non-interactive mode
+# non-interactive mode; specify the package name to the command line
 if [[ $1 =~ .*/.* ]]
 then
 	SBO_QRY="$1"
@@ -28,10 +32,15 @@ else
 	read -rep "Enter the package group and name (e.g. libraries/libsodium) " SBO_QRY
 fi
 
-SBO_VER="${SBO_VER:-14.1}"
-SBO_REP="http://slackbuilds.org/slackbuilds/$SBO_VER"
 SBO_PKG="${SBO_QRY##*/}"
 SBO_URL="$SBO_REP/$SBO_QRY.tar.gz"
+
+# Slackbuild makeflags
+# http://www.linuxquestions.org/questions/slackware-14/is-there-a-way-to-speed-up-slackbuilds-887355/
+if [[ $CORE =~ ^[0-9]?[0-9]$ ]]
+then
+	export MAKEFLAGS="-j$CORE"
+fi
 
 sbo_exit() {
  	echo "Cleaning up..."
@@ -71,12 +80,12 @@ sbo_unpack() {
 sbo_source() {
 	echo "PKGNAM VERSION HOMEPAGE DOWNLOAD MD5SUM DOWNLOAD REQUIRES MAINTAINER EMAIL"
 	source "$SBO_PKG".info
-	# Split strings to arrays
+	# Split strings into arrays to handle multiple URLs
 	DOWNLOAD=( $DOWNLOAD ); DOWNLOAD_x86_64=( $DOWNLOAD_x86_64 )
 	MD5SUM=( $MD5SUM ); MD5SUM_x86_64=( $MD5SUM_x86_64 )
 	REQUIRES=( $REQUIRES )
 
-	local i; i=0
+	local i; i=0 # Arrays start count at 0
 	if [[ $(uname -m) == x86_64 && -n $DOWNLOAD_x86_64 ]]
 	then
 		for DLSUM64 in "${DOWNLOAD[@]}"; do
@@ -111,19 +120,24 @@ sbo_deps() {
 }
 
 sbo_build() {
-	# Dirty hack. Root/non-root sections differ per SlackBuild.
-	if [[ $FAKEROOT == 1 ]]
+	if [[ $FROOT == 1 ]]
 	then
-		# sed -i 's|^chown|#chown|' ${SBO_PKG}.SlackBuild
+		# Make sure we don't break systems with custom umask.
+		# installpkg does NOT preserve existing permissions
+		umask 0022
+
+		# FIXME: Root/non-root sections differ per SlackBuild, so the entire
+		# Slackbuild is run with fakeroot
 		fakeroot ./"$SBO_PKG".SlackBuild
 	else
+		umask 0022
 		./"$SBO_PKG".SlackBuild
 	fi
 }
 
 trap sbo_exit EXIT
 
-# Logging
+# Redirect output to logfile
 SBO_LOG="/tmp/slackman-$SBO_PKG.log"
 
 if [[ $LOG == 0 ]] || ! touch "$SBO_LOG"
@@ -157,4 +171,4 @@ sbo_build	>> "$SBO_LOG" 2>&1
 sbo_failcheck
 
 echo "Done!"
-
+unset MAKEFLAGS TMP OUTPUT
