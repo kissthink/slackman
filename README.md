@@ -9,7 +9,8 @@ Most of these are optional.
 
 **Usage**
 
-Slackman is controlled via environment variables.
+Slackman is controlled with the following environment variables: 
+- *FROOT SBO_VER TMP OUTPUT CORE LOG*
 
 ```
 $ slackman <package>/<category>
