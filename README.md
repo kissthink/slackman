@@ -7,7 +7,9 @@ Simple SBo manager. Features:
 
 Most of these are optional.
 
-*Usage*
+**Usage**
+
+Slackman is controlled via environment variables.
 
 ```
 $ slackman <package>/<category>
