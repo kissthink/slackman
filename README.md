@@ -7,7 +7,7 @@ Simple SBo manager. Features:
 
 Most of these are optional.
 
-**Usage**
+##Usage
 
 Slackman is controlled with the following environment variables: 
 - *FROOT* {0,1} Enable/disable fakeroot. Disabled if run as root.
