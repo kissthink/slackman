@@ -1,5 +1,5 @@
 Simple SBo manager. Features:
-- Fakeroot to build packages without root access
+- Fakeroot to build packages without root access (needs system/fakeroot)
 - Muli-threaded builds
 - Silent output, only errors are displayed
 - Integrity checking with gpg, md5sum, umask
