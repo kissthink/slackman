@@ -9,7 +9,12 @@ FROOT="${FROOT:-1}"
 CORE="${CORE:-2}"
 LOG="${LOG:-1}"
 
-if [[ $UID == 0 ]]
+if [[ $UID == 0 ]] && ! shopt -q login_shell
+then
+	echo "If you wish to build as root, run a login shell"
+	echo "with sudo -i or su -"
+	exit 1
+elif [[ $UID == 0 ]]
 then
 	read -rep $'You are now building as root. Continue?\n'
 	FROOT=0
@@ -24,7 +29,7 @@ then
 	export OUTPUT="${OUTPUT:-$HOME}"
 fi
 
-# non-interactive mode; specify the package name to the command line
+# non-interactive mode; specify the package name on the command line
 if [[ $1 =~ .*/.* ]]
 then
 	SBO_QRY="$1"
@@ -37,7 +42,7 @@ SBO_URL="$SBO_REP/$SBO_QRY.tar.gz"
 
 # Slackbuild makeflags
 # http://www.linuxquestions.org/questions/slackware-14/is-there-a-way-to-speed-up-slackbuilds-887355/
-if [[ $CORE =~ ^[0-9]?[0-9]$ ]]
+if [[ $CORE =~ ^[1-9]?[0-9]$ ]]
 then
 	export MAKEFLAGS="-j$CORE"
 fi
@@ -145,7 +150,7 @@ sbo_build() {
 
 trap sbo_exit EXIT
 
-# Make sure we don't break systems with custom umask:
+# Make sure we don't break systems with custom umask;
 # installpkg overwrites existing permissions
 # http://www.adras.com/12-2-installpkg-messing-up-perms.t8907-75.html
 umask 0022
