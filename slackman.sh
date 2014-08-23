@@ -9,7 +9,6 @@ FROOT="${FROOT:-1}"
 CORE="${CORE:-2}"
 LOG="${LOG:-1}"
 
-# Note sudo will break (gpg) permissions
 if [[ $UID == 0 ]]
 then
 	read -rep $'You are now building as root. Continue?\n'
@@ -146,7 +145,7 @@ sbo_build() {
 
 trap sbo_exit EXIT
 
-# Make sure we don't break systems with custom umask;
+# Make sure we don't break systems with custom umask:
 # installpkg overwrites existing permissions
 # http://www.adras.com/12-2-installpkg-messing-up-perms.t8907-75.html
 umask 0022
