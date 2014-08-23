@@ -10,7 +10,14 @@ Most of these are optional.
 **Usage**
 
 Slackman is controlled with the following environment variables: 
-- *FROOT SBO_VER TMP OUTPUT CORE LOG*
+- *FROOT* {0,1} Enable/disable fakeroot
+- *SBO_VER* {11.0..14.1} Slackware version
+- *TMP* Build folder
+- *OUTPUT* Package folder
+- *CORE* {1..99} Amount of CPU threads
+- *LOG* {0,1} Enable/disable logs
+
+Examples:
 
 ```
 $ slackman <package>/<category>
@@ -28,4 +35,4 @@ Build with 16 threads (default: 2)
 $ LOG=0 slackman
 ```
 
-Verbose output
+Log all output to stdout
