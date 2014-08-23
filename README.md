@@ -10,7 +10,7 @@ Most of these are optional.
 **Usage**
 
 Slackman is controlled with the following environment variables: 
-- *FROOT* {0,1} Enable/disable fakeroot
+- *FROOT* {0,1} Enable/disable fakeroot. Disabled if run as root.
 - *SBO_VER* {11.0..14.1} Slackware version
 - *TMP* Build folder
 - *OUTPUT* Package folder
