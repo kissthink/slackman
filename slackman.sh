@@ -122,7 +122,7 @@ sbo_deps() {
 	local i; i=
 	for i in "${REQUIRES[@]}"
 	do
-		SBO_INS+=( $(ls /var/log/packages | grep -o "$i") )
+		SBO_INS+=( $(echo /var/log/packages/* | grep -o "$i") )
 	done
 
 	if [[ ${REQUIRES[@]} != ${SBO_INS[@]} ]]
