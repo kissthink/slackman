@@ -62,7 +62,7 @@ fi
 sbo_exit() {
  	echo "Cleaning up..."
 	popd >/dev/null
-	rm -r "$SBO_PKG" "$SBO_PKG.tar.gz" "$SBO_PKG.tar.gz.asc"
+	rm -r "$SBO_PKG{,.tar.gz,.tar.gz.asc}"
 }
 
 sbo_failcheck() {
@@ -80,8 +80,7 @@ sbo_failcheck() {
 }
 
 sbo_download() {
-	wget "$SBO_URL".asc
-	wget "$SBO_URL"
+	wget "$SBO_URL{,.asc}"
 }
 
 sbo_verify() {
@@ -97,6 +96,7 @@ sbo_unpack() {
 sbo_source() {
 	echo "PKGNAM VERSION HOMEPAGE DOWNLOAD MD5SUM DOWNLOAD REQUIRES MAINTAINER EMAIL"
 	source "$SBO_PKG".info
+	
 	# Split strings into arrays to handle multiple URLs.
 	DOWNLOAD=( $DOWNLOAD ); DOWNLOAD_x86_64=( $DOWNLOAD_x86_64 )
 	MD5SUM=( $MD5SUM ); MD5SUM_x86_64=( $MD5SUM_x86_64 )
